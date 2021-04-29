@@ -1,5 +1,6 @@
 package educanet.models;
 
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryUtil;
@@ -18,6 +19,8 @@ public class Square {
     private int vboId;
     private int eboId;
     private int colorId;
+    public Matrix4f matrix = new Matrix4f()
+            .identity();
 
     public Square(float[] vertices, int[] indices, float[] color) {
         vaoId = GL33.glGenVertexArrays();

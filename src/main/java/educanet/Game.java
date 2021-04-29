@@ -46,6 +46,13 @@ public class Game {
             1.0f, 1.0f, 1.0f,
     };
 
+    private static final float[] colorsRed = {
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+    };
+
     private static final int[] indices = {
             0, 1, 3, // First triangle
             1, 2, 3 // Second triangle
@@ -142,7 +149,7 @@ public class Game {
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, colorsId);
 
         FloatBuffer cb = BufferUtils.createFloatBuffer(colors.length)
-                .put(colors)
+                .put(colorsRed)
                 .flip();
 
         // Send the buffer (positions) to the GPU
@@ -207,15 +214,21 @@ public class Game {
     public static void render(long window) {
         GL33.glUseProgram(Shaders.shaderProgramId);
 
-        GL33.glBindVertexArray(gradient.vaoId);
-        GL33.glDrawElements(GL33.GL_TRIANGLES, gradient.indices.length, GL33.GL_UNSIGNED_INT, 0);
+        //GL33.glBindVertexArray(gradient.vaoId);
+        //GL33.glDrawElements(GL33.GL_TRIANGLES, gradient.indices.length, GL33.GL_UNSIGNED_INT, 0);
         // Draw using the glDrawElements function
+
         for(int y = 0; y<rows; y++) {
             for(int x = 0; x<cols; x++) {
+                mazeArray[y][x].matrix.get(matrixFloatBuffer);
+                GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixFloatBuffer);
+
                 GL33.glBindVertexArray(mazeArray[y][x].vaoId);
                 GL33.glDrawElements(GL33.GL_TRIANGLES, mazeArray[y][x].indices.length, GL33.GL_UNSIGNED_INT, 0);
             }
         }
+        matrix.get(matrixFloatBuffer);
+        GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixFloatBuffer);
 
         GL33.glBindVertexArray(squareVaoId);
         GL33.glDrawElements(GL33.GL_TRIANGLES, indices.length, GL33.GL_UNSIGNED_INT, 0);
@@ -224,7 +237,7 @@ public class Game {
     }
 
     public static void update(long window) {
-        float color = 0.01f;
+        /*float color = 0.01f;
         Random rand = new Random();
         int i = rand.nextInt(12);
         //for(int i=0; i<grd.length; i+= (Math.random() * ((3 - 1) + 1)) + 1) {
@@ -235,29 +248,28 @@ public class Game {
             if(goDown) grd[i] -= color;
             else grd[i] += color;
         //}
-        /*System.out.println(grd[1]);
+        System.out.println(grd[1]);
         if(grd[1] >= 1.0f) goDown = true;
         else if(grd[1] <= 0.0f) goDown = false;
         if(goDown) grd[1] -= 0.01f;
-        else grd[1] += 0.01f;*/
-        gradient = gradient(grd);
+        else grd[1] += 0.01f;
+        gradient = gradient(grd);*/
 
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
-            matrix = matrix.translate(0.03f, 0f, 0f);
+            matrix = matrix.translate(0.02f, 0f, 0f);
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
-            matrix = matrix.translate(-0.03f, 0f, 0f);
+            matrix = matrix.translate(-0.02f, 0f, 0f);
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
-            matrix = matrix.translate(0f, 0.03f, 0f);
+            matrix = matrix.translate(0f, 0.02f, 0f);
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS) {
-            matrix = matrix.translate(0f, -0.03f, 0f);
+            matrix = matrix.translate(0f, -0.02f, 0f);
         }
 
         // TODO: Send to GPU only if position updated
-        matrix.get(matrixFloatBuffer);
-        GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixFloatBuffer);
+
 
     }
 
