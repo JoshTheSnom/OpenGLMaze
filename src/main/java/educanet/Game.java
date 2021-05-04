@@ -33,10 +33,10 @@ public class Game {
     };
 
     private static final float[] vertices = {
-            0.1f, 0.1f, 0.0f, // 0 -> Top right
-            0.1f, -0.1f, 0.0f, // 1 -> Bottom right
-            -0.1f, -0.1f, 0.0f, // 2 -> Bottom left
-            -0.1f, 0.1f, 0.0f, // 3 -> Top left
+            0.3f, 0.0f, 0.0f, // 0 -> Top right
+            0.3f, -0.3f, 0.0f, // 1 -> Bottom right
+            0.0f, -0.3f, 0.0f, // 2 -> Bottom left
+            0.0f, 0.0f, 0.0f, // 3 -> Top left
     };
 
     private static final float[] colors = {
@@ -65,9 +65,15 @@ public class Game {
     private static int uniformMatrixLocation;
     private static Matrix4f matrix = new Matrix4f()
             .identity()
-            .translate(0.25f, 0.25f, 0.25f);
+            .translate(0.1f, 0.1f, 0.1f);
     // 4x4 -> FloatBuffer of size 16
     private static FloatBuffer matrixFloatBuffer = BufferUtils.createFloatBuffer(16);
+
+    private static float xPlayer = vertices[9];
+    private static float yPlayer = vertices[10];
+    private static float xPlayer2 = vertices[3];
+    private static float yPlayer2 = vertices[4];
+
     public static void init(long window) {
 
         //System.out.println(squareSize);
@@ -93,7 +99,6 @@ public class Game {
         gradient = gradient(grd);
         for(int y = 0; y<rows; y++) {
             for (int x = 0; x < cols; x++) {
-                System.out.println(maze[y][0]);
                 Square square;
                 square = createSquare(maze[y][0], maze[y][1], maze[y][2], white);
                 mazeArray[y][x] = square;
@@ -105,6 +110,8 @@ public class Game {
             //xCord = -1.0f;
             //yCord -= squareSize;
         }
+
+
 
 
         Shaders.initShaders();
@@ -257,20 +264,48 @@ public class Game {
 
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
             matrix = matrix.translate(0.02f, 0f, 0f);
+            xPlayer += 0.02f;
+            xPlayer2 += 0.02f;
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
             matrix = matrix.translate(-0.02f, 0f, 0f);
+            xPlayer -= 0.02f;
+            xPlayer2 -= 0.02f;
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
             matrix = matrix.translate(0f, 0.02f, 0f);
+            yPlayer += 0.02f;
+            yPlayer2 += 0.02f;
         }
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS) {
             matrix = matrix.translate(0f, -0.02f, 0f);
+            yPlayer -= 0.02f;
+            yPlayer2 -= 0.02f;
         }
 
         // TODO: Send to GPU only if position updated
+       if(checkCollisions()) System.out.println("colission");
 
+    }
 
+    public static boolean checkCollisions() {
+
+        for(int y = 0; y<rows; y++) {
+            for(int x = 0; x<cols; x++) {
+                    float xCoord = mazeArray[y][x].vertices[9];
+                    float yCoord = mazeArray[y][x].vertices[10];
+                    float xCoord2 = mazeArray[y][x].vertices[3];
+                    float yCoord2 = mazeArray[y][x].vertices[4];
+                    System.out.println(xCoord + " " + yCoord + " " + xCoord2 + " " + yCoord2);
+                    System.out.println(xPlayer + " " + yPlayer + " " + xPlayer2 + " " + yPlayer2);
+
+                    if (((xPlayer > xCoord && xPlayer < xCoord2) || (xPlayer2 > xCoord && xPlayer2 < xCoord2))
+                                && ((yPlayer > yCoord && yPlayer < yCoord2) || (yPlayer2 > yCoord && yPlayer2 < yCoord2))) {
+                        return true;
+                    }
+            }
+        }
+        return false;
     }
 
 }

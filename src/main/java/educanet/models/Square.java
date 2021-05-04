@@ -10,7 +10,7 @@ import java.nio.IntBuffer;
 
 public class Square {
 
-    private float[] vertices;
+    public float[] vertices;
     public int[] indices;
 
     private float[] color;
