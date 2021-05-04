@@ -53,6 +53,13 @@ public class Game {
             1.0f, 0.0f, 0.0f,
     };
 
+    private static final float[] colorsGreen = {
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+    };
+
     private static final int[] indices = {
             0, 1, 3, // First triangle
             1, 2, 3 // Second triangle
@@ -64,8 +71,7 @@ public class Game {
     private static int colorsId;
     private static int uniformMatrixLocation;
     private static Matrix4f matrix = new Matrix4f()
-            .identity()
-            .translate(0.1f, 0.1f, 0.1f);
+            .identity();
     // 4x4 -> FloatBuffer of size 16
     private static FloatBuffer matrixFloatBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -284,7 +290,28 @@ public class Game {
         }
 
         // TODO: Send to GPU only if position updated
-       if(checkCollisions()) System.out.println("colission");
+       if(checkCollisions()) {
+           GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, colorsId);
+
+           FloatBuffer cb = BufferUtils.createFloatBuffer(colors.length)
+                   .put(colorsGreen)
+                   .flip();
+
+           // Send the buffer (positions) to the GPU
+           GL33.glBufferData(GL33.GL_ARRAY_BUFFER, cb, GL33.GL_STATIC_DRAW);
+           GL33.glVertexAttribPointer(1, 3, GL33.GL_FLOAT, false, 0, 0);
+       }
+       else {
+           GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, colorsId);
+
+           FloatBuffer cb = BufferUtils.createFloatBuffer(colors.length)
+                   .put(colorsRed)
+                   .flip();
+
+           // Send the buffer (positions) to the GPU
+           GL33.glBufferData(GL33.GL_ARRAY_BUFFER, cb, GL33.GL_STATIC_DRAW);
+           GL33.glVertexAttribPointer(1, 3, GL33.GL_FLOAT, false, 0, 0);
+       }
 
     }
 
@@ -293,11 +320,11 @@ public class Game {
         for(int y = 0; y<rows; y++) {
             for(int x = 0; x<cols; x++) {
                     float xCoord = mazeArray[y][x].vertices[9];
-                    float yCoord = mazeArray[y][x].vertices[10];
+                    float yCoord = mazeArray[y][x].vertices[4];
                     float xCoord2 = mazeArray[y][x].vertices[3];
-                    float yCoord2 = mazeArray[y][x].vertices[4];
-                    System.out.println(xCoord + " " + yCoord + " " + xCoord2 + " " + yCoord2);
-                    System.out.println(xPlayer + " " + yPlayer + " " + xPlayer2 + " " + yPlayer2);
+                    float yCoord2 = mazeArray[y][x].vertices[10];
+                    //System.out.println(xCoord + " " + yCoord + " " + xCoord2 + " " + yCoord2);
+                    //System.out.println(xPlayer + " " + yPlayer + " " + xPlayer2 + " " + yPlayer2);
 
                     if (((xPlayer > xCoord && xPlayer < xCoord2) || (xPlayer2 > xCoord && xPlayer2 < xCoord2))
                                 && ((yPlayer > yCoord && yPlayer < yCoord2) || (yPlayer2 > yCoord && yPlayer2 < yCoord2))) {
