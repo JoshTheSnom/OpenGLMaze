@@ -79,6 +79,10 @@ public class Game {
     private static float yPlayer = vertices[10];
     private static float xPlayer2 = vertices[3];
     private static float yPlayer2 = vertices[4];
+    private static float xMove = 0.005f;
+    private static float yMove = 0.004f;
+    private static boolean bouncedRight = false;
+    private static boolean bouncedTop = false;
 
     public static void init(long window) {
 
@@ -231,7 +235,7 @@ public class Game {
         //GL33.glDrawElements(GL33.GL_TRIANGLES, gradient.indices.length, GL33.GL_UNSIGNED_INT, 0);
         // Draw using the glDrawElements function
 
-        for(int y = 0; y<rows; y++) {
+        /*for(int y = 0; y<rows; y++) {
             for(int x = 0; x<cols; x++) {
                 mazeArray[y][x].matrix.get(matrixFloatBuffer);
                 GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixFloatBuffer);
@@ -239,7 +243,7 @@ public class Game {
                 GL33.glBindVertexArray(mazeArray[y][x].vaoId);
                 GL33.glDrawElements(GL33.GL_TRIANGLES, mazeArray[y][x].indices.length, GL33.GL_UNSIGNED_INT, 0);
             }
-        }
+        }*/
         matrix.get(matrixFloatBuffer);
         GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixFloatBuffer);
 
@@ -250,25 +254,32 @@ public class Game {
     }
 
     public static void update(long window) {
-        /*float color = 0.01f;
-        Random rand = new Random();
-        int i = rand.nextInt(12);
-        //for(int i=0; i<grd.length; i+= (Math.random() * ((3 - 1) + 1)) + 1) {
-            if(grd[i] >= 1.0f) goDown = true;
-            if(grd[i] <= 0.0f) goDown = false;
-            //if(grd[i] == 0 | grd[i] == 3 | grd[i] == 6 | grd[i] == 9) color = 0.03f;
-            else color = 0.05f;
-            if(goDown) grd[i] -= color;
-            else grd[i] += color;
-        //}
-        System.out.println(grd[1]);
-        if(grd[1] >= 1.0f) goDown = true;
-        else if(grd[1] <= 0.0f) goDown = false;
-        if(goDown) grd[1] -= 0.01f;
-        else grd[1] += 0.01f;
-        gradient = gradient(grd);*/
 
-        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
+        matrix = matrix.translate(xMove, yMove, 0f);
+        xPlayer += xMove;
+        xPlayer2 += xMove;
+        yPlayer += yMove;
+        yPlayer2 += yMove;
+
+        if(xPlayer2 >= 1) {
+            xMove = 0 - xMove;
+            bouncedRight = true;
+        }
+        if(xPlayer <= -1) {
+            xMove = 0 - xMove;
+            bouncedRight = false;
+        }
+
+        if(yPlayer >= 1) {
+            yMove = 0 - yMove;
+            bouncedTop = true;
+        }
+        if(yPlayer2 <= -1) {
+            yMove = 0 - yMove;
+            bouncedTop = false;
+        }
+
+        /*if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
             matrix = matrix.translate(0.02f, 0f, 0f);
             xPlayer += 0.02f;
             xPlayer2 += 0.02f;
@@ -287,10 +298,10 @@ public class Game {
             matrix = matrix.translate(0f, -0.02f, 0f);
             yPlayer -= 0.02f;
             yPlayer2 -= 0.02f;
-        }
+        }*/
 
         // TODO: Send to GPU only if position updated
-       if(checkCollisions()) {
+       /*if(checkCollisions()) {
            GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, colorsId);
 
            FloatBuffer cb = BufferUtils.createFloatBuffer(colors.length)
@@ -301,17 +312,17 @@ public class Game {
            GL33.glBufferData(GL33.GL_ARRAY_BUFFER, cb, GL33.GL_STATIC_DRAW);
            GL33.glVertexAttribPointer(1, 3, GL33.GL_FLOAT, false, 0, 0);
        }
-       else {
+       else {*/
            GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, colorsId);
 
            FloatBuffer cb = BufferUtils.createFloatBuffer(colors.length)
-                   .put(colorsRed)
+                   .put(colors)
                    .flip();
 
            // Send the buffer (positions) to the GPU
            GL33.glBufferData(GL33.GL_ARRAY_BUFFER, cb, GL33.GL_STATIC_DRAW);
            GL33.glVertexAttribPointer(1, 3, GL33.GL_FLOAT, false, 0, 0);
-       }
+      // }
 
     }
 
